@@ -12,6 +12,7 @@ class MainActivity : AppCompatActivity() {
 
         // Example of a call to a native method
         sample_text.text = stringFromJNI()
+        sample_text1.text="我爱你";
     }
 
     /**
