@@ -1,4 +1,4 @@
-package com.rainbell.www.slidelayout;
+package com.example.denis.myapplication.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -57,7 +57,8 @@ public class ScrollerLayout extends ViewGroup {
             for (int j = 0; j < childCount; j++) {
                 View view = getChildAt(j);
                 Log.e("view", "==" + view.getMeasuredWidth());
-                view.layout(0, j * view.getMeasuredHeight(), view.getMeasuredWidth(), (j + 1) * view.getMeasuredHeight());
+                view.layout(0, time, view.getMeasuredWidth(), time+= view.getMeasuredHeight());
+//                time+=view.getMeasuredHeight();
             }
             Log.e("onLayout  ", "childCount=" + childCount);
         }
