@@ -1,4 +1,4 @@
-package com.rainbell.www.slidelayout
+package com.rainbell.simple
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
