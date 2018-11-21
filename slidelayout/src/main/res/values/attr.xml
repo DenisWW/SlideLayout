@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CusRelativeLayout">
+        <attr name="textString" format="string">请,设置,标题</attr>
+        <attr name="titleTextSize" format="dimension">14.0f</attr>
+        <attr name="textRegex" format="string">,</attr>
+        <attr name="textSelectorColor" format="color"/>
+        <attr name="textSelectorColorStart" format="color"/>
+        <attr name="textSelectorColorEnd" format="color"/>
+
+
+        <attr name="textUnSelectorColor" format="color"/>
+        <attr name="textUnSelectorColorStart" format="color"/>
+        <attr name="textUnSelectorColorEnd" format="color"/>
+
+
+        <attr name="selectorColor" format="color">#fff</attr>
+        <attr name="childRightBottom" format="dimension">0</attr>
+        <attr name="childLeftBottom" format="dimension">0</attr>
+        <attr name="childLeftTop" format="dimension">0</attr>
+        <attr name="childRightTop" format="dimension">0</attr>
+
+
+        <attr name="childTitlePaddingBottom" format="dimension">0</attr>
+        <attr name="childTitlePaddingTop" format="dimension">0</attr>
+        <attr name="childTitlePaddingLeft" format="dimension">0</attr>
+        <attr name="childTitlePaddingRight" format="dimension">0</attr>
+        <attr name="childTitlePadding" format="dimension">0</attr>
+
+        <attr name="childTitleMarginBottom" format="dimension">0</attr>
+        <attr name="childTitleMarginTop" format="dimension">0</attr>
+        <attr name="childTitleMarginLeft" format="dimension">0</attr>
+        <attr name="childTitleMarginRight" format="dimension">0</attr>
+        <attr name="childTitleMargin" format="dimension">0</attr>
+
+
+        <attr name="radiusBackgroundRightTop" format="dimension">0</attr>
+        <attr name="radiusBackgroundLeftTop" format="dimension">0</attr>
+        <attr name="radiusBackgroundLeftBottom" format="dimension">0</attr>
+        <attr name="radiusBackgroundRightBottom" format="dimension">0</attr>
+        <attr name="radiusBackground" format="dimension">0</attr>
+        <attr name="radiusBackgroundHalf" format="boolean">true</attr>
+
+
+        <attr name="backgroundHeight" format="dimension">0</attr>
+        <attr name="backgroundWidth" format="dimension">0</attr>
+
+        <attr name="backgroundMargin" format="dimension">0</attr>
+        <attr name="backgroundMarginLeft" format="dimension">0</attr>
+        <attr name="backgroundMarginTop" format="dimension">0</attr>
+        <attr name="backgroundMarginRight" format="dimension">0</attr>
+        <attr name="backgroundMarginBottom" format="dimension">0</attr>
+
+        <attr name="backgroundBottom" format="boolean">false</attr>
+        <attr name="defaultSelectorPosition" format="integer">0</attr>
+
+        <attr name="backgroundGradientColorStart" format="color">0</attr>
+        <attr name="backgroundGradientColorEnd" format="color">0</attr>
+        <attr name="backgroundGradientColorDirection" format="enum">
+            <enum name="horizontal" value="1"/>
+            <enum name="vertical" value="2"/>
+            <enum name="leftTopDown" value="3"/>
+            <enum name="leftBottomUp" value="4"/>
+        </attr>
+        <!--<attr name="backgroundGradientDirection"-->
+
+    </declare-styleable>
+</resources>

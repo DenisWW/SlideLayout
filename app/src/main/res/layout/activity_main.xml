@@ -8,8 +8,12 @@
     tools:context=".MainActivity">
 
     <com.rainbell.www.slidelayout.ScrollerLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:id="@+id/scroll_Layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true">
+
         <TextView
             android:id="@+id/sample_text"
             android:layout_width="wrap_content"
@@ -21,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Hello World!"
-            app:layout_constraintTop_toBottomOf="@+id/sample_text"/>
+            />
     </com.rainbell.www.slidelayout.ScrollerLayout>
 
 </android.support.constraint.ConstraintLayout>

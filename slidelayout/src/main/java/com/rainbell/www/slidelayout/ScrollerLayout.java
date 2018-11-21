@@ -55,11 +55,31 @@ public class ScrollerLayout extends ViewGroup {
             int childCount = getChildCount();
             for (int j = 0; j < childCount; j++) {
                 View view = getChildAt(j);
-                view.layout(0, time, view.getMeasuredWidth(), time+= view.getMeasuredHeight());
+                view.layout(0, time, view.getMeasuredWidth(), time += view.getMeasuredHeight());
 //                time+=view.getMeasuredHeight();
             }
         }
     }
+
+//    @Override
+//    public boolean dispatchTouchEvent(MotionEvent ev) {
+//        Log.e("dispatchTouchEvent", "==" + ev.getAction() + "   mYLastMove=" + mYLastMove);
+//        switch (ev.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                mYDown = ev.getRawY();
+//                mYLastMove = mYDown;
+//                break;
+//            case MotionEvent.ACTION_MOVE:
+//                mYMove = ev.getRawY();
+//                float diff = Math.abs(mYMove - mYDown);
+//                mYLastMove = mYMove;
+//                if (diff > mTouchSlop) {
+//                    return true;
+//                }
+//                break;
+//        }
+//        return super.dispatchTouchEvent(ev);
+//    }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
@@ -73,13 +93,12 @@ public class ScrollerLayout extends ViewGroup {
                 mYMove = ev.getRawY();
                 float diff = Math.abs(mYMove - mYDown);
                 mYLastMove = mYMove;
+                Log.e("onInterceptTouchEvent", "==" + ev.getAction() + "   mYLastMove=" + mYLastMove);
                 if (diff > mTouchSlop) {
                     return true;
                 }
                 break;
         }
-
-
         return super.onInterceptTouchEvent(ev);
     }
 
@@ -87,6 +106,8 @@ public class ScrollerLayout extends ViewGroup {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        Log.e("onTouchEvent", "==" + event.getAction()) ;
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_MOVE:
                 mYMove = event.getRawY();
