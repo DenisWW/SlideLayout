@@ -13,12 +13,13 @@ import android.text.DynamicLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 
 public class TitleTextView extends AppCompatTextView {
     private Context context;
     private TextPaint paint;
     private String textString;
-    private int bg_W, bg_Left, bg_Y, width, height, viewWith, direction;
+    private int viewHeight, width, height, viewWith, direction;
     private int padLeft;
     @ColorInt
     private int textSelectorColor,
@@ -66,6 +67,16 @@ public class TitleTextView extends AppCompatTextView {
         if (paint != null) paint.setTextSize(size);
     }
 
+
+
+    public boolean isLeft() {
+        return start > -getWidth();
+    }
+
+    public boolean isRight() {
+        return start < getWidth();
+    }
+
     private void init() {
         if (paint == null) {
             paint = this.getPaint();
@@ -76,12 +87,17 @@ public class TitleTextView extends AppCompatTextView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (!TextUtils.isEmpty(textString)) viewWith = (int) paint.measureText(textString);
-        if (viewWith != 0)
+        if (!TextUtils.isEmpty(textString) && viewWith == 0)
+            viewWith = (int) paint.measureText(textString);
+        if (viewWith != 0) {
             widthMeasureSpec = MeasureSpec.makeMeasureSpec(viewWith + getPaddingLeft() + getPaddingRight(), MeasureSpec.EXACTLY);
-        Paint.FontMetricsInt fontMetrics = paint.getFontMetricsInt();
-//        Log.e("fontMetrics.bottom=", fontMetrics.bottom + "    fontMetrics.top= " + fontMetrics.top+ "    fontMetrics.ascent= " + fontMetrics.ascent+ "    fontMetrics.descent= " + fontMetrics.descent+ "    fontMetrics.leading= " + fontMetrics.leading);
-        heightMeasureSpec = MeasureSpec.makeMeasureSpec(fontMetrics.bottom - fontMetrics.top + getPaddingBottom() + getPaddingTop(), MeasureSpec.EXACTLY);
+        }
+        if (viewHeight == 0) {
+            Paint.FontMetricsInt fontMetrics = paint.getFontMetricsInt();
+            viewHeight = fontMetrics.bottom - fontMetrics.top + getPaddingBottom() + getPaddingTop();
+        }
+        if (viewHeight != 0)
+            heightMeasureSpec = MeasureSpec.makeMeasureSpec(viewHeight, MeasureSpec.EXACTLY);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
@@ -92,29 +108,35 @@ public class TitleTextView extends AppCompatTextView {
 
     }
 
+    private Path path;
+    private RectF rectF;
+    private int baseline;
+
     @Override
     protected void onDraw(Canvas canvas) {
 //        super.onDraw(canvas);
-        //绘制渐变
-//        Log.e("onDraw=", height + "   width==" + width );
-
         if (direction != 0 && textUnSelectorColorStart != 0 && textUnSelectorColorEnd != 0) {
             setDirection(false);
             paint.setShader(linearGradient);
         } else if (textUnSelectorColor != 0) paint.setColor(textUnSelectorColor);
         else paint.setColor(Color.GREEN);
-
-        Path path = new Path();//背景path
-        RectF rectF = new RectF(start, 0.0f, start + getWidth(), height);
+        if (rectF == null)
+            rectF = new RectF(start, 0.0f, start + getWidth(), height);
+        else {
+            rectF.left = start;
+            rectF.right = start + getWidth();
+        }
         if (radii.length < 8)
             radii = new float[]{height / 2, height / 2, height / 2, height / 2, height / 2, height / 2, height / 2, height / 2};
+        path = new Path();
         path.addRoundRect(rectF, radii, Path.Direction.CW);
-//        canvas.drawPath(path, paint);//画背景
-        Paint.FontMetricsInt fontMetrics = paint.getFontMetricsInt();
-        int baseline = height - getPaddingBottom() - fontMetrics.bottom;
-        canvas.drawText(textString, getPaddingLeft(), baseline, paint); //先画一遍内容
+        if (baseline == 0) {
+            Paint.FontMetricsInt fontMetrics = paint.getFontMetricsInt();
+            baseline = height - getPaddingBottom() - fontMetrics.bottom;
+        }
+        canvas.drawText(textString, getPaddingLeft(), baseline, paint);
         canvas.save();
-        drawText(rectF, canvas, path, baseline);//再画交汇的内容
+        drawText(rectF, canvas, path, baseline);
         canvas.restore();
     }
 
@@ -126,12 +148,7 @@ public class TitleTextView extends AppCompatTextView {
         else paint.setColor(Color.WHITE);
 
         paint.setShader(null);
-//        Rect rect = new Rect();
-//        rectF.roundOut(rect);
         canvas.clipPath(path);
-//        paint.getTextBounds(textString, 0, textString.length(), rect);
-//        float dx = getWidth() / 2 - rect.width() / 2;
-//        float dx = getWidth() / 2 - rectF.width() / 2;
         canvas.drawText(textString, getPaddingLeft(), baseline, paint);
     }
 
@@ -139,7 +156,14 @@ public class TitleTextView extends AppCompatTextView {
         this.start = start;
         invalidate();
     }
-
+    public  void setLeft(){
+        this.start = -getWidth();
+        postInvalidate();
+    }
+    public  void setRight(){
+        this.start = getWidth();
+        postInvalidate();
+    }
     public void setRadiusValues(float[] radii) {
         if (radii.length >= 8)
             this.radii = radii;
@@ -180,9 +204,7 @@ public class TitleTextView extends AppCompatTextView {
         super.onSizeChanged(w, h, oldw, oldh);
         width = w;
         height = h;
-        bg_W = width;
         textString = getText().toString();
-//        Log.e("height=", height + "   width==" + width + "  ==" + getTextSize() + "    " + paint.getTextSize());
         if (start == 0) start = -getMeasuredWidth();
 
     }
@@ -194,7 +216,6 @@ public class TitleTextView extends AppCompatTextView {
 //        if (mDynamicLayout == null)
 //            mDynamicLayout = new DynamicLayout(textString, paint, viewWith, Layout.Alignment.ALIGN_NORMAL, 1.2f, 0.0f, true);
 //        return mDynamicLayout.getHeight();
-
         return 0;
     }
 

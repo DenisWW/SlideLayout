@@ -22,7 +22,7 @@ public class CusRelativeManager {
             viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int i, float v, int i1) {
-                    if (cusRelativeLayout != null) cusRelativeLayout.setViewOffset(i, v);
+                    if (cusRelativeLayout != null) cusRelativeLayout.setViewOffset(i, v,i1,cusRelativeLayout.getId());
 
                 }
 

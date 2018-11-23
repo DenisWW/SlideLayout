@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.rainbell.www.slidelayout.R;
 
@@ -73,13 +72,14 @@ public class CusRelativeLayout extends RelativeLayout {
 
     private float textSize, start0ffset, differenceOffset;
     private String[] mStrings = new String[]{};
-    private TextView[] titleTvs;
+    private TitleTextView[] titleTvs;
     @IdRes
     int[] mInts;
     private int measure;
     private TitleTextView currentView, nextView;
     private ClickTitleViewListener listener;
     private int direction, defaultSelectorPosition;
+
 
     public CusRelativeLayout(Context context) {
         this(context, null);
@@ -101,7 +101,6 @@ public class CusRelativeLayout extends RelativeLayout {
         getChildPaddingAttrs(typedArray);
         getChildMarginAttrs(typedArray);
         getColorAttrs(typedArray);
-
 
         init();
         createdTitleViews();
@@ -170,7 +169,7 @@ public class CusRelativeLayout extends RelativeLayout {
             TitleTextView titleTv;
             mStrings = text.split(regex);
             LayoutParams params;
-            titleTvs = new TextView[mStrings.length];
+            titleTvs = new TitleTextView[mStrings.length];
             mInts = new int[mStrings.length];
             for (int i = 0; i < mStrings.length; i++) {
                 titleTv = new TitleTextView(context);
@@ -192,12 +191,6 @@ public class CusRelativeLayout extends RelativeLayout {
         }
     }
 
-    private void setTitleOnClickListener(int pos, TitleTextView myTextView) {
-        myTextView.setOnClickListener((view) -> {
-            if (listener != null)
-                listener.onClickTitleListener(pos, myTextView.getText().toString());
-        });
-    }
 
     public void setDefaultSelectorPosition(int defaultSelectorPosition) {
         this.defaultSelectorPosition = defaultSelectorPosition;
@@ -208,6 +201,208 @@ public class CusRelativeLayout extends RelativeLayout {
     public void setListener(ClickTitleViewListener listener) {
         this.listener = listener;
     }
+
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+//        if (measure == 0) {
+//            for (int i = 0; i < getChildCount(); i++) {
+//                View view = getChildAt(i);
+//                if (view instanceof MyTextView)
+//                    measure += paint.measureText(((MyTextView) view).getText().toString());
+//            }
+//        }
+//        Paint.FontMetricsInt fontMetrics = paint.getFontMetricsInt();
+//        heightMeasureSpec = MeasureSpec.makeMeasureSpec(fontMetrics.bottom - fontMetrics.top + getPaddingBottom() + getPaddingTop(), MeasureSpec.EXACTLY);
+//        heightMeasureSpec = MeasureSpec.makeMeasureSpec(backgroundView.getMeasuredHeight(), MeasureSpec.UNSPECIFIED);
+//        widthMeasureSpec = MeasureSpec.makeMeasureSpec(measure, MeasureSpec.EXACTLY);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+    }
+
+    private void setTitleOnClickListener(int pos, TitleTextView myTextView) {
+        myTextView.setOnClickListener((view) -> {
+            if (listener != null) {
+                listener.onClickTitleListener(pos, myTextView.getText().toString());
+            }
+        });
+    }
+
+    public void setViewOffset(int pos, float offset, int i1, int id) {
+//        Log.e("id=" + id + "pos=", pos + " defaultSelectorPosition= " + defaultSelectorPosition + "     offset= " + offset);
+        if (offset >= 0) {
+            if (pos >= 0 && pos < titleTvs.length - 1) {
+                currentView = titleTvs[pos];
+                nextView = titleTvs[pos + 1];
+                currentLayoutParams = (LayoutParams) currentView.getLayoutParams();
+                nextLayoutParams = (LayoutParams) nextView.getLayoutParams();
+                start0ffset = (currentLayoutParams.leftMargin + currentView.getWidth() + currentLayoutParams.rightMargin) * offset;
+                differenceOffset = (nextView.getWidth() - currentView.getWidth());
+                if (differenceOffset != 0) {
+                    layoutParams.width = currentView.getWidth()
+                            - (backgroundBottom && backgroundMarginLeft > 0 ? (int) backgroundMarginLeft : 0)
+                            - (backgroundBottom && backgroundMarginRight > 0 ? (int) backgroundMarginRight : 0)
+                            + (int) (differenceOffset * offset);
+                } else layoutParams.width = currentView.getWidth()
+                        - (backgroundBottom && backgroundMarginLeft > 0 ? (int) backgroundMarginLeft : 0)
+                        - (backgroundBottom && backgroundMarginRight > 0 ? (int) backgroundMarginRight : 0);
+                layoutParams.leftMargin = (int) (start0ffset + currentView.getLeft() + (backgroundBottom && backgroundMarginLeft > 0 ? backgroundMarginLeft : 0));
+                currentView.setStart(start0ffset);
+                nextView.setStart(-(nextView.getWidth() - (layoutParams.width - (currentView.getWidth() - start0ffset) - (currentLayoutParams.rightMargin + nextLayoutParams.leftMargin))));
+                backgroundView.setLayoutParams(layoutParams);
+            } else if (pos == titleTvs.length - 1) {
+                currentView = titleTvs[pos];
+                layoutParams.width = currentView.getWidth()
+                        - (backgroundBottom && backgroundMarginLeft > 0 ? (int) backgroundMarginLeft : 0)
+                        - (backgroundBottom && backgroundMarginRight > 0 ? (int) backgroundMarginRight : 0);
+                layoutParams.leftMargin = (int) (currentView.getLeft() +
+                        (backgroundBottom && backgroundMarginLeft > 0 ? backgroundMarginLeft : 0));
+                backgroundView.setLayoutParams(layoutParams);
+            }
+
+            if (defaultSelectorPosition != pos) {
+                if (defaultSelectorPosition > pos) {
+                    if (defaultSelectorPosition - pos > 1) {
+//                        for (int j = (pos + 2); j <= (defaultSelectorPosition < titleTvs.length ? defaultSelectorPosition : titleTvs.length - 1); j++) {
+                        for (int j = (defaultSelectorPosition < titleTvs.length ? defaultSelectorPosition : titleTvs.length - 1); j >= (pos + 2); j--) {
+                            if (titleTvs[j].isLeft()) titleTvs[j].setLeft();
+                        }
+                    } else {
+                        if (pos + 2 < titleTvs.length)
+                            if (titleTvs[pos + 2].isLeft()) titleTvs[pos + 2].setLeft();
+                    }
+                } else {
+                    if (pos - defaultSelectorPosition > 1) {
+                        for (int j = defaultSelectorPosition; j < pos - 1; j++) {
+                            if (titleTvs[j].isLeft()) titleTvs[j].setLeft();
+                        }
+                    } else {
+                        if (pos - 1 >= 0)
+                            if (titleTvs[pos - 1].isRight()) titleTvs[pos - 1].setRight();
+
+                    }
+                }
+                defaultSelectorPosition = pos;
+            }
+
+        }
+    }
+
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        if (changed) {
+            Log.e("CusRelativeLayout=", changed + " layoutParams= " + (layoutParams == null));
+            TitleTextView defaultView = null;
+            for (int i = 0; i < getChildCount(); i++) {
+//                Log.e("CusRelativeLayout      " + this.getId(), i + getChildAt(i).toString() + "=" + getChildAt(i).getRight());
+                if (getChildAt(i) instanceof TitleTextView && (defaultSelectorPosition + 1) == i) {
+                    defaultView = (TitleTextView) getChildAt(i);
+                    break;
+                }
+            }
+            if (defaultView != null && layoutParams == null) {
+                defaultView.setStart(0);
+                if (backgroundBottom && ((backgroundWidth != 0 || backgroundHeight != 0)))
+                    layoutParams = new LayoutParams((int) ((backgroundWidth > 0 ? backgroundWidth : defaultView.getWidth())
+                            - (backgroundMarginLeft > 0 ? backgroundMarginLeft : 0)
+                            - (backgroundMarginRight > 0 ? backgroundMarginRight : 0)),
+                            (int) (backgroundHeight > 0 ? backgroundHeight : defaultView.getHeight()));
+                else
+                    layoutParams = new LayoutParams(defaultView.getWidth()
+                            , defaultView.getHeight()
+                    );
+
+//                layoutParams = new LayoutParams((int) (defaultView.getMeasuredWidth()
+//                        - (backgroundMarginLeft > 0 ? backgroundMarginLeft : 0)
+//                        - (backgroundMarginRight > 0 ? backgroundMarginRight : 0))
+//                        , (int) (defaultView.getMeasuredHeight()
+//                        - (backgroundMarginTop > 0 ? backgroundMarginTop : 0)
+//                        - (backgroundMarginBottom > 0 ? backgroundMarginBottom : 0))
+//                );
+                if (backgroundBottom)
+                    layoutParams.addRule(BELOW, defaultView.getId());
+                if (backgroundBottom && (backgroundMarginLeft > 0
+                        || backgroundMarginTop > 0
+                        || backgroundMarginRight > 0
+                        || backgroundMarginBottom > 0
+                )) {
+                    LayoutParams lp = (LayoutParams) defaultView.getLayoutParams();
+                    int leftTotal;
+                    if (defaultSelectorPosition > 0)
+                        leftTotal = defaultView.getLeft() + (int) backgroundMarginLeft;
+                    else leftTotal = lp.leftMargin + (int) backgroundMarginLeft;
+                    layoutParams.setMargins(
+                            leftTotal,
+                            (int) backgroundMarginTop,
+                            (int) backgroundMarginRight,
+                            (int) backgroundMarginBottom);
+//                    layoutParams.setMargins(
+//                            leftTotal,
+//                            lp.topMargin + (int) backgroundMarginTop,
+//                            lp.rightMargin + (int) backgroundMarginRight,
+//                            lp.bottomMargin + (int) backgroundMarginBottom);
+
+                } else {
+                    LayoutParams lp = (LayoutParams) defaultView.getLayoutParams();
+                    layoutParams.setMargins(
+                            lp.leftMargin,
+                            lp.topMargin,
+                            lp.rightMargin,
+                            lp.bottomMargin);
+                }
+                backgroundView.setLayoutParams(layoutParams);
+                layoutParams = (LayoutParams) backgroundView.getLayoutParams();
+            }
+        }
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        Log.e("onSizeChanged=", " w= " + w + " oldw=" + oldw);
+    }
+
+    private void getChildMarginAttrs(TypedArray typedArray) {
+        childTitleMargin = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitleMargin, 0.0f);
+        if (childTitleMargin == 0) {
+            childTitleMarginBottom = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitleMarginBottom, 0.0f);
+            childTitleMarginLeft = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitleMarginLeft, 0.0f);
+            childTitleMarginTop = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitleMarginTop, 0.0f);
+            childTitleMarginRight = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitleMarginRight, 0.0f);
+        } else {
+            childTitleMarginBottom = childTitleMarginLeft = childTitleMarginTop = childTitleMarginRight = childTitleMargin;
+        }
+
+    }
+
+    private void getChildPaddingAttrs(TypedArray typedArray) {
+        childTitlePadding = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitlePadding, 0.0f);
+        if (childTitlePadding == 0) {
+            childTitlePaddingBottom = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitlePaddingBottom, 0.0f);
+            childTitlePaddingLeft = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitlePaddingLeft, 0.0f);
+            childTitlePaddingTop = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitlePaddingTop, 0.0f);
+            childTitlePaddingRight = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitlePaddingRight, 0.0f);
+        } else {
+            childTitlePaddingBottom = childTitlePaddingLeft = childTitlePaddingTop = childTitlePaddingRight = childTitlePadding;
+        }
+    }
+
+    private void getRadiusAttrs(TypedArray typedArray) {
+        radiusBackgroundHalf = typedArray.getBoolean(R.styleable.CusRelativeLayout_radiusBackgroundHalf, false);
+        if (!radiusBackgroundHalf) {
+            radiusBackground = typedArray.getDimension(R.styleable.CusRelativeLayout_radiusBackground, 0.0f);
+            if (radiusBackground == 0) {
+                radiusBackgroundRightTop = typedArray.getDimension(R.styleable.CusRelativeLayout_radiusBackgroundRightTop, 0.0f);
+                radiusBackgroundLeftTop = typedArray.getDimension(R.styleable.CusRelativeLayout_radiusBackgroundLeftTop, 0.0f);
+                radiusBackgroundLeftBottom = typedArray.getDimension(R.styleable.CusRelativeLayout_radiusBackgroundLeftBottom, 0.0f);
+                radiusBackgroundRightBottom = typedArray.getDimension(R.styleable.CusRelativeLayout_radiusBackgroundRightBottom, 0.0f);
+            } else
+                radiusBackgroundRightTop = radiusBackgroundLeftTop = radiusBackgroundLeftBottom = radiusBackgroundRightBottom = radiusBackground;
+        }
+    }
+
 
     private void createdMarginSetting(LayoutParams params) {
         if (childTitleMargin > 0 ||
@@ -279,176 +474,6 @@ public class CusRelativeLayout extends RelativeLayout {
 //        setWillNotDraw(false);
     }
 
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        if (measure == 0) {
-//            for (int i = 0; i < getChildCount(); i++) {
-//                View view = getChildAt(i);
-//                if (view instanceof MyTextView)
-//                    measure += paint.measureText(((MyTextView) view).getText().toString());
-//            }
-//        }
-//        Paint.FontMetricsInt fontMetrics = paint.getFontMetricsInt();
-//        heightMeasureSpec = MeasureSpec.makeMeasureSpec(fontMetrics.bottom - fontMetrics.top + getPaddingBottom() + getPaddingTop(), MeasureSpec.EXACTLY);
-//        heightMeasureSpec = MeasureSpec.makeMeasureSpec(backgroundView.getMeasuredHeight(), MeasureSpec.UNSPECIFIED);
-//        widthMeasureSpec = MeasureSpec.makeMeasureSpec(measure, MeasureSpec.EXACTLY);
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-    }
-
-    public void setViewOffset(int pos, float offset) {
-        if (offset > 0) {
-            if (pos >= 0 && pos < getChildCount() - 1) {
-                currentView = (TitleTextView) getChildAt(pos + 1);
-                nextView = (TitleTextView) getChildAt(pos + 2);
-                if (nextView == null) return;
-                currentLayoutParams = (LayoutParams) currentView.getLayoutParams();
-                nextLayoutParams = (LayoutParams) nextView.getLayoutParams();
-                start0ffset = (currentLayoutParams.leftMargin + currentView.getWidth() + currentLayoutParams.rightMargin) * offset;
-                differenceOffset = (nextView.getMeasuredWidth() - currentView.getMeasuredWidth());
-                if (differenceOffset != 0)
-                    layoutParams.width = (int) (currentView.getMeasuredWidth()
-                            - (backgroundBottom && backgroundMarginLeft > 0 ? backgroundMarginLeft : 0)
-                            - (backgroundBottom && backgroundMarginRight > 0 ? backgroundMarginRight : 0)
-                            + (differenceOffset * offset));
-
-                layoutParams.leftMargin = (int) (start0ffset + currentView.getLeft() + (backgroundBottom && backgroundMarginLeft > 0 ? backgroundMarginLeft : 0));
-                backgroundView.setLayoutParams(layoutParams);
-                currentView.setStart(start0ffset);
-                nextView.setStart(-(nextView.getMeasuredWidth() - (layoutParams.width - (currentView.getMeasuredWidth() - start0ffset) - (currentLayoutParams.rightMargin + nextLayoutParams.leftMargin))));
-            }
-        }
-    }
-
-
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
-        if (changed) {
-            TitleTextView defaultView = null;
-            for (int i = 0; i < getChildCount(); i++) {
-                Log.e("CusRelativeLayout      " + this.getId(), i + getChildAt(i).toString() + "=" + getChildAt(i).getRight());
-                if (getChildAt(i) instanceof TitleTextView && (defaultSelectorPosition + 1) == i) {
-                    defaultView = (TitleTextView) getChildAt(i);
-                    defaultView.setStart(0);
-                    break;
-                }
-            }
-            if (defaultView != null && layoutParams == null) {
-                if (backgroundBottom && ((backgroundWidth != 0 || backgroundHeight != 0)))
-                    layoutParams = new LayoutParams((int) ((backgroundWidth > 0 ? backgroundWidth : defaultView.getMeasuredWidth())
-                            - (backgroundMarginLeft > 0 ? backgroundMarginLeft : 0)
-                            - (backgroundMarginRight > 0 ? backgroundMarginRight : 0)),
-                            (int) (backgroundHeight > 0 ? backgroundHeight : defaultView.getMeasuredHeight()));
-                else
-                    layoutParams = new LayoutParams(defaultView.getMeasuredWidth()
-                            , defaultView.getMeasuredHeight()
-                    );
-
-//                layoutParams = new LayoutParams((int) (defaultView.getMeasuredWidth()
-//                        - (backgroundMarginLeft > 0 ? backgroundMarginLeft : 0)
-//                        - (backgroundMarginRight > 0 ? backgroundMarginRight : 0))
-//                        , (int) (defaultView.getMeasuredHeight()
-//                        - (backgroundMarginTop > 0 ? backgroundMarginTop : 0)
-//                        - (backgroundMarginBottom > 0 ? backgroundMarginBottom : 0))
-//                );
-                if (backgroundBottom)
-                    layoutParams.addRule(BELOW, defaultView.getId());
-                if (backgroundBottom && (backgroundMarginLeft > 0
-                        || backgroundMarginTop > 0
-                        || backgroundMarginRight > 0
-                        || backgroundMarginBottom > 0
-                )) {
-                    LayoutParams lp = (LayoutParams) defaultView.getLayoutParams();
-                    int leftTotal;
-                    if (defaultSelectorPosition > 0)
-                        leftTotal = defaultView.getLeft() + (int) backgroundMarginLeft;
-                    else leftTotal = lp.leftMargin + (int) backgroundMarginLeft;
-                    layoutParams.setMargins(
-                            leftTotal,
-                            (int) backgroundMarginTop,
-                            (int) backgroundMarginRight,
-                            (int) backgroundMarginBottom);
-//                    layoutParams.setMargins(
-//                            leftTotal,
-//                            lp.topMargin + (int) backgroundMarginTop,
-//                            lp.rightMargin + (int) backgroundMarginRight,
-//                            lp.bottomMargin + (int) backgroundMarginBottom);
-
-                } else {
-                    LayoutParams lp = (LayoutParams) defaultView.getLayoutParams();
-                    layoutParams.setMargins(
-                            lp.leftMargin,
-                            lp.topMargin,
-                            lp.rightMargin,
-                            lp.bottomMargin);
-                }
-
-                backgroundView.setLayoutParams(layoutParams);
-                layoutParams = (LayoutParams) backgroundView.getLayoutParams();
-            }
-        }
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        Log.e("onSizeChanged   ", this.getId() + "w=" + w + "  h=" + h);
-    }
-
-    private void getChildMarginAttrs(TypedArray typedArray) {
-        childTitleMargin = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitleMargin, 0.0f);
-        if (childTitleMargin == 0) {
-            childTitleMarginBottom = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitleMarginBottom, 0.0f);
-            childTitleMarginLeft = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitleMarginLeft, 0.0f);
-            childTitleMarginTop = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitleMarginTop, 0.0f);
-            childTitleMarginRight = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitleMarginRight, 0.0f);
-        } else {
-            childTitleMarginBottom = childTitleMarginLeft = childTitleMarginTop = childTitleMarginRight = childTitleMargin;
-        }
-
-    }
-
-    private void getChildPaddingAttrs(TypedArray typedArray) {
-        childTitlePadding = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitlePadding, 0.0f);
-        if (childTitlePadding == 0) {
-            childTitlePaddingBottom = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitlePaddingBottom, 0.0f);
-            childTitlePaddingLeft = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitlePaddingLeft, 0.0f);
-            childTitlePaddingTop = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitlePaddingTop, 0.0f);
-            childTitlePaddingRight = typedArray.getDimension(R.styleable.CusRelativeLayout_childTitlePaddingRight, 0.0f);
-        } else {
-            childTitlePaddingBottom = childTitlePaddingLeft = childTitlePaddingTop = childTitlePaddingRight = childTitlePadding;
-        }
-    }
-
-    private void getRadiusAttrs(TypedArray typedArray) {
-        radiusBackgroundHalf = typedArray.getBoolean(R.styleable.CusRelativeLayout_radiusBackgroundHalf, false);
-        if (!radiusBackgroundHalf) {
-            radiusBackground = typedArray.getDimension(R.styleable.CusRelativeLayout_radiusBackground, 0.0f);
-            if (radiusBackground == 0) {
-                radiusBackgroundRightTop = typedArray.getDimension(R.styleable.CusRelativeLayout_radiusBackgroundRightTop, 0.0f);
-                radiusBackgroundLeftTop = typedArray.getDimension(R.styleable.CusRelativeLayout_radiusBackgroundLeftTop, 0.0f);
-                radiusBackgroundLeftBottom = typedArray.getDimension(R.styleable.CusRelativeLayout_radiusBackgroundLeftBottom, 0.0f);
-                radiusBackgroundRightBottom = typedArray.getDimension(R.styleable.CusRelativeLayout_radiusBackgroundRightBottom, 0.0f);
-            } else
-                radiusBackgroundRightTop = radiusBackgroundLeftTop = radiusBackgroundLeftBottom = radiusBackgroundRightBottom = radiusBackground;
-        }
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-//        super.onDraw(canvas);
-//        Log.e("onDraw", "=======" + text);
-//        paint.setColor(ContextCompat.getColor(getContext(), R.color.end));
-//        paint.setTextSize(20.0f);
-//        Paint.FontMetricsInt fontMetrics = paint.getFontMetricsInt();
-//        int baseline = getHeight() - getPaddingBottom() - fontMetrics.bottom;
-//        canvas.drawText(text, 0, baseline, paint);
-//        canvas.save();
-//        invalidate();
-
-    }
 
     public enum Direction {
         horizontal, vertical, leftTopDown, leftBottomUp,
