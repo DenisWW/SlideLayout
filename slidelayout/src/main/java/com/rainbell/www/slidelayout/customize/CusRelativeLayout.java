@@ -1,5 +1,6 @@
 package com.rainbell.www.slidelayout.customize;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -10,9 +11,13 @@ import android.support.annotation.IdRes;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.WindowManager;
+import android.widget.HorizontalScrollView;
 import android.widget.RelativeLayout;
 
 import com.rainbell.www.slidelayout.R;
@@ -68,18 +73,18 @@ public class CusRelativeLayout extends RelativeLayout {
     private Paint paint;
     private BackgroupTextView backgroundView;
     private Context context;
-    private LayoutParams layoutParams, currentLayoutParams, nextLayoutParams;
+    private LayoutParams layoutParams;
 
-    private float textSize, start0ffset, differenceOffset;
+    private float textSize;
     private String[] mStrings = new String[]{};
     private TitleTextView[] titleTvs;
     @IdRes
     int[] mInts;
-    private int measure;
+    private int measureScreenW;
     private TitleTextView currentView, nextView;
     private ClickTitleViewListener listener;
     private int direction, defaultSelectorPosition;
-
+    private HorizontalScrollView scrollViewH;
 
     public CusRelativeLayout(Context context) {
         this(context, null);
@@ -205,17 +210,6 @@ public class CusRelativeLayout extends RelativeLayout {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        if (measure == 0) {
-//            for (int i = 0; i < getChildCount(); i++) {
-//                View view = getChildAt(i);
-//                if (view instanceof MyTextView)
-//                    measure += paint.measureText(((MyTextView) view).getText().toString());
-//            }
-//        }
-//        Paint.FontMetricsInt fontMetrics = paint.getFontMetricsInt();
-//        heightMeasureSpec = MeasureSpec.makeMeasureSpec(fontMetrics.bottom - fontMetrics.top + getPaddingBottom() + getPaddingTop(), MeasureSpec.EXACTLY);
-//        heightMeasureSpec = MeasureSpec.makeMeasureSpec(backgroundView.getMeasuredHeight(), MeasureSpec.UNSPECIFIED);
-//        widthMeasureSpec = MeasureSpec.makeMeasureSpec(measure, MeasureSpec.EXACTLY);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
     }
@@ -229,15 +223,14 @@ public class CusRelativeLayout extends RelativeLayout {
     }
 
     public void setViewOffset(int pos, float offset, int i1, int id) {
-//        Log.e("id=" + id + "pos=", pos + " defaultSelectorPosition= " + defaultSelectorPosition + "     offset= " + offset);
         if (offset >= 0) {
             if (pos >= 0 && pos < titleTvs.length - 1) {
                 currentView = titleTvs[pos];
                 nextView = titleTvs[pos + 1];
-                currentLayoutParams = (LayoutParams) currentView.getLayoutParams();
-                nextLayoutParams = (LayoutParams) nextView.getLayoutParams();
-                start0ffset = (currentLayoutParams.leftMargin + currentView.getWidth() + currentLayoutParams.rightMargin) * offset;
-                differenceOffset = (nextView.getWidth() - currentView.getWidth());
+                LayoutParams currentLayoutParams = (LayoutParams) currentView.getLayoutParams();
+                LayoutParams nextLayoutParams = (LayoutParams) nextView.getLayoutParams();
+                float start0ffset = (currentLayoutParams.leftMargin + currentView.getWidth() + currentLayoutParams.rightMargin) * offset;
+                float differenceOffset = (nextView.getWidth() - currentView.getWidth());
                 if (differenceOffset != 0) {
                     layoutParams.width = currentView.getWidth()
                             - (backgroundBottom && backgroundMarginLeft > 0 ? (int) backgroundMarginLeft : 0)
@@ -259,7 +252,13 @@ public class CusRelativeLayout extends RelativeLayout {
                         (backgroundBottom && backgroundMarginLeft > 0 ? backgroundMarginLeft : 0));
                 backgroundView.setLayoutParams(layoutParams);
             }
-
+            if (scrollViewH == null && getParent() instanceof HorizontalScrollView) {
+                ViewParent viewParent = getParent();
+                scrollViewH = (HorizontalScrollView) viewParent;
+            }
+            if (scrollViewH != null && measureScreenW > 0) {
+                scrollViewH.smoothScrollTo(layoutParams.leftMargin - (measureScreenW / 2), 0);
+            }
             if (defaultSelectorPosition != pos) {
                 if (defaultSelectorPosition > pos) {
                     if (defaultSelectorPosition - pos > 1) {
@@ -283,6 +282,7 @@ public class CusRelativeLayout extends RelativeLayout {
                     }
                 }
                 defaultSelectorPosition = pos;
+
             }
 
         }
@@ -293,7 +293,7 @@ public class CusRelativeLayout extends RelativeLayout {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
         if (changed) {
-            Log.e("CusRelativeLayout=", changed + " layoutParams= " + (layoutParams == null));
+//            Log.e("CusRelativeLayout=", changed + " layoutParams= " + (layoutParams == null));
             TitleTextView defaultView = null;
             for (int i = 0; i < getChildCount(); i++) {
 //                Log.e("CusRelativeLayout      " + this.getId(), i + getChildAt(i).toString() + "=" + getChildAt(i).getRight());
@@ -310,8 +310,7 @@ public class CusRelativeLayout extends RelativeLayout {
                             - (backgroundMarginRight > 0 ? backgroundMarginRight : 0)),
                             (int) (backgroundHeight > 0 ? backgroundHeight : defaultView.getHeight()));
                 else
-                    layoutParams = new LayoutParams(defaultView.getWidth()
-                            , defaultView.getHeight()
+                    layoutParams = new LayoutParams(defaultView.getWidth(), defaultView.getHeight()
                     );
 
 //                layoutParams = new LayoutParams((int) (defaultView.getMeasuredWidth()
@@ -361,7 +360,7 @@ public class CusRelativeLayout extends RelativeLayout {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        Log.e("onSizeChanged=", " w= " + w + " oldw=" + oldw);
+//        Log.e("onSizeChanged=", " w= " + w + " oldw=" + oldw);
     }
 
     private void getChildMarginAttrs(TypedArray typedArray) {
@@ -463,13 +462,14 @@ public class CusRelativeLayout extends RelativeLayout {
      * @param dipValue
      * @return
      */
-    public static int dip2px(Context context, float dipValue) {
+    public int dip2px(Context context, float dipValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dipValue * scale + 0.5f);
     }
 
     private void init() {
         if (TextUtils.isEmpty(regex)) regex = ",";
+        if (measureScreenW == 0) measureScreenW = this.getScreenWidth(context);
 //        paint = new Paint();
 //        setWillNotDraw(false);
     }
@@ -587,4 +587,10 @@ public class CusRelativeLayout extends RelativeLayout {
 //        this.postInvalidate();
     }
 
+    private int getScreenWidth(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(outMetrics);
+        return outMetrics.widthPixels;
+    }
 }
