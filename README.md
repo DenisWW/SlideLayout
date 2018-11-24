@@ -2,6 +2,16 @@
 Android滑动layout
 高仿今日头条导航栏
 
+简单使用与设置
+
+CusRelativeManager cusRelativeManager3 = 
+new CusRelativeManager.Builder(CusRelativeLayout,viewPager).addClicTitleViewListener(this).build();
+
+ new CusRelativeManager.CusRelativeLayoutBuilder()
+               .setText("我的桌子,我的爱,椅子,板凳,桌子啊,沙发啊,我的天").build(CusRelativeLayout);
 
 
-混淆注意： -keep class com.rainbell.www.slidelayout.customize.**{*;}
+
+
+
+混淆注意： -keep class com.ranbell,www.slidelayout.customize.** {*;}
