@@ -2,7 +2,7 @@
 Android滑动layout
 高仿今日头条导航栏
 
-简单使用与设置：
+简单使用与设置（内容使用 ','分割）：
 
 CusRelativeManager cusRelativeManager3 = 
 new CusRelativeManager.Builder(CusRelativeLayout,viewPager).addClicTitleViewListener(this).build();
