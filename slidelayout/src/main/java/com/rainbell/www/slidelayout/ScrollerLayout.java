@@ -3,6 +3,7 @@ package com.rainbell.www.slidelayout;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -10,22 +11,41 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.Scroller;
 
+/**
+ * /**
+ * * MeasureSpec类的具体使用
+ * 1. 获取测量模式（Mode）
+ * int specMode=MeasureSpec.getMode(measureSpec)
+ * <p>
+ * 2. 获取测量大小（Size）
+ * int specSize=MeasureSpec.getSize(measureSpec)
+ * <p>
+ * 3. 通过Mode 和 Size 生成新的SpecMode
+ * int measureSpec=MeasureSpec.makeMeasureSpec(size,mode);
+ */
 public class ScrollerLayout extends ViewGroup {
 
+    /**
+     * Scroller纯做滑动计算用， 滑动还是需要刷新界面
+     */
     private Scroller mScroller;
-    private int time = 0;
+    //最大拖拽距离越大响应越慢 越迟钝 越小 响应越快 越灵敏
+    int mTotalDragDistance;
+    //最大位移
+    int mSpinnerOffsetEnd;
     /**
      * 判定为拖动的最小移动像素数
      */
     private int mTouchSlop;
     private float mYDown = 0;
     private float mYMove = 0;
-
+    private int height;
 
     /**
      * 上次触发ACTION_MOVE事件时的屏幕坐标
      */
     private float mYLastMove;
+    int count;
 
     public ScrollerLayout(Context context) {
         this(context, null);
@@ -35,51 +55,41 @@ public class ScrollerLayout extends ViewGroup {
         super(context, attrs);
         mScroller = new Scroller(context);
         ViewConfiguration viewConfiguration = ViewConfiguration.get(context);
-        mTouchSlop = viewConfiguration.getScaledPagingTouchSlop();
+        mTouchSlop = viewConfiguration.getScaledTouchSlop();
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        mTotalDragDistance = (int) (100 * metrics.density);
+//        mSpinnerOffsetEnd = mTotalDragDistance;
+        mSpinnerOffsetEnd = (int) (64 * metrics.density);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int childCount = getChildCount();
-        for (int i = 0; i < childCount; i++) {
+        height = 0;
+        for (int i = 0; i < getChildCount(); i++) {
             View childView = getChildAt(i);
-            // 为ScrollerLayout中的每一个子控件测量大小
             measureChild(childView, widthMeasureSpec, heightMeasureSpec);
+            height += childView.getMeasuredHeight();
         }
+        setMeasuredDimension(widthMeasureSpec, height);
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
     }
 
     @Override
     protected void onLayout(boolean b, int i, int i1, int i2, int i3) {
-        if (b) {
-            int childCount = getChildCount();
-            for (int j = 0; j < childCount; j++) {
-                View view = getChildAt(j);
-                view.layout(0, time, view.getMeasuredWidth(), time += view.getMeasuredHeight());
-//                time+=view.getMeasuredHeight();
-            }
+//        if (b) {
+        int time = 0;
+        for (int j = 0; j < getChildCount(); j++) {
+            View view = getChildAt(j);
+            Log.e("view", "=" + view.toString() + "    =" + view.getMeasuredWidth());
+            view.layout(0, time, view.getMeasuredWidth(), time += view.getMeasuredHeight());
         }
-    }
-
-//    @Override
-//    public boolean dispatchTouchEvent(MotionEvent ev) {
-//        Log.e("dispatchTouchEvent", "==" + ev.getAction() + "   mYLastMove=" + mYLastMove);
-//        switch (ev.getAction()) {
-//            case MotionEvent.ACTION_DOWN:
-//                mYDown = ev.getRawY();
-//                mYLastMove = mYDown;
-//                break;
-//            case MotionEvent.ACTION_MOVE:
-//                mYMove = ev.getRawY();
-//                float diff = Math.abs(mYMove - mYDown);
-//                mYLastMove = mYMove;
-//                if (diff > mTouchSlop) {
-//                    return true;
-//                }
-//                break;
 //        }
-//        return super.dispatchTouchEvent(ev);
-//    }
+    }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
@@ -93,40 +103,15 @@ public class ScrollerLayout extends ViewGroup {
                 mYMove = ev.getRawY();
                 float diff = Math.abs(mYMove - mYDown);
                 mYLastMove = mYMove;
-                Log.e("onInterceptTouchEvent", "==" + ev.getAction() + "   mYLastMove=" + mYLastMove);
                 if (diff > mTouchSlop) {
                     return true;
                 }
                 break;
         }
+
+
         return super.onInterceptTouchEvent(ev);
     }
-
-
-    @SuppressLint("ClickableViewAccessibility")
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        Log.e("onTouchEvent", "==" + event.getAction()) ;
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_MOVE:
-                mYMove = event.getRawY();
-                float scrollY = mYLastMove - mYMove;
-                scrollBy(0, (int) scrollY);
-                mYLastMove = mYMove;
-                break;
-            case MotionEvent.ACTION_UP:
-                // 当手指抬起时，根据当前的滚动值来判定应该滚动到哪个子控件的界面
-//                int targetIndex = (getScrollX() + getWidth() / 2) / getWidth();
-//                int dx = targetIndex * getWidth() - getScrollX();
-                // 第二步，调用startScroll()方法来初始化滚动数据并刷新界面
-                mScroller.startScroll(0, getScrollY(), 0, -getScrollY());
-                invalidate();
-                break;
-        }
-        return super.onTouchEvent(event);
-    }
-
 
     @Override
     public void computeScroll() {
@@ -137,4 +122,100 @@ public class ScrollerLayout extends ViewGroup {
         }
 //        super.computeScroll();
     }
+
+    /**
+     * scrollTo 的坐标是绝对位置
+     * scrollBy 的坐标是相对位置的距离
+     *
+     * @param event
+     * @return
+     */
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mYDown = event.getRawY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                mYMove = event.getRawY();
+                float scrollY = (mYLastMove - mYMove) * 0.5f;
+                float overscrollTop = (mYMove - mYDown) * 0.5F;
+//                Log.e("    event.getY();", "=" + mYMove + "  event.getRawY()=" + mYDown + "    =" + event.getY());
+                if (scrollY < 0) {
+//                    scrollBy(0, (int) scrollY);
+                }
+                if (overscrollTop <= 0.0F) {
+                    return false;
+                }
+                moveSpinner(overscrollTop);
+//                scrollTo(0, (int) (mYDown - mYMove));
+                mYLastMove = mYMove;
+                // ViewCompat.offsetTopAndBottom(this, -(int) scrollY);
+                break;
+            case MotionEvent.ACTION_UP:
+                // 调用startScroll()方法来初始化滚动数据并刷新界面
+                mScroller.startScroll(0, getScrollY(), 0, -getScrollY());
+//                mScroller.startScroll(0, getScrollY(), 0, mSpinnerOffsetEnd);
+                float y = event.getY();
+                overscrollTop = (y - mYDown) * 0.5F;
+                finishSpinner(overscrollTop);
+                invalidate();
+                break;
+        }
+        return super.onTouchEvent(event);
+    }
+
+    private void finishSpinner(float overscrollTop) {
+
+    }
+
+
+    /**
+     * 仿照google下拉刷新 控件 计算弹力值
+     *
+     * @param overscrollTop
+     */
+    private void moveSpinner(float overscrollTop) {
+
+        //原始百分比
+        float originalDragPercent = overscrollTop / this.mTotalDragDistance;
+        //拖拽百分比
+        float dragPercent = Math.min(1.0F, Math.abs(originalDragPercent));
+
+        //位移距离减去总的移动距离
+        float extraOS = Math.abs(overscrollTop) - this.mTotalDragDistance;
+
+        //弹力抵消 =totalDragDistance
+        float slingshotDist = mSpinnerOffsetEnd;
+
+        //张力弹弓百分比
+        // 当 extraOS值为小于等于0  说明移动距离小于等于总的拖拽距离（totalDragDistance）  此数为0
+        // 当extraOs 为正值  说明移动距离大于总的拖拽距离（totalDragDistance） 此数为正数 也就是大于0 最大值为2  当extraOS 大于slingshotDist的2倍时，取最大2
+        float tensionSlingshotPercent = Math.max(0.0F, Math.min(extraOS, slingshotDist * 2.0F) / slingshotDist);
+
+        //紧张百分比
+        // 当 tensionSlingshotPercent 为0 的时候 也就是说明移动距离小于等于总的拖拽距离（totalDragDistance） 此值为0
+        // 当tensionSlingshotPercent大于0 说明移动距离大于总的拖拽距离（totalDragDistance）
+        // 当tensionSlingshotPercent为最大值2的时候  tensionPercent最大值为1/2
+        float tensionPercent = (float) ((double) (tensionSlingshotPercent / 4.0F) - Math.pow((double) (tensionSlingshotPercent / 4.0F), 2.0D)) * 2.0F;
+
+        //额外移动距离 最小值为 0 最大值为 slingshotDist=mTotalDragDistance  当滑动距离不超过mTotalDragDistance 时 当前值为0
+        // 当滑动距离超过 mTotalDragDistance 最大为 slingshotDist
+        float extraMove = slingshotDist * tensionPercent * 2.0F;
+
+        //得出最终 偏移量
+        // 当移动距离小于 mTotalDragDistance 不做弹力抵消   只算 移动距离占总距离的百分比（最大为1） 乘以  dragPercent  extraMove值为0
+        // 当移动距离大于mTotalDragDistance    移动距离 + 拖拽的最大距离extraMove（最大为slingshotDist）  extraMove值为0
+        int targetY = (int) (slingshotDist * dragPercent + extraMove);
+        setTargetOffsetTopAndBottom(targetY);
+    }
+
+    void setTargetOffsetTopAndBottom(int offset) {
+//        把当前View提到画面图层的最上面来显示
+//        this.bringToFront();
+        scrollTo(0, -offset);
+    }
+
+
 }

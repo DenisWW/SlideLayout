@@ -1,23 +1,40 @@
 package com.rainbell.simple
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.rainbell.simple.activity.TitleActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import android.view.MotionEvent
+import android.R.attr.action
+
 
 class MainActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // Example of a call to a native method
         sample_text.text = stringFromJNI()
-        sample_text1.text="我爱你";
-        sample_text.setOnClickListener{
-            Toast.makeText(this,"woaini ",Toast.LENGTH_SHORT).show();
+        sample_text1.text = "我爱你";
+        sample_text1.setOnClickListener {
+//            var  number =10;
+//            number = number shl 1
+//            number = number shr 1;
+//            Log.e("number","=="+Integer.toBinaryString(number));
+            Toast.makeText(this, sample_text1!!.text, Toast.LENGTH_SHORT).show();
         };
+        sample_text.setOnClickListener {
+            val intent = Intent();
+            intent.setClass(this, TitleActivity().javaClass)
+//            intent.setClass(this, TitleActivity::class.java)
+            startActivity(intent)
+
+        }
+
     }
 
     /**

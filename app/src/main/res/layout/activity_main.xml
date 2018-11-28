@@ -11,19 +11,20 @@
         android:id="@+id/scroll_Layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true">
+        android:clickable="true">
 
         <TextView
             android:id="@+id/sample_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="10dp"
             android:text="Hello World!"/>
 
         <TextView
             android:id="@+id/sample_text1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="10dp"
             android:text="Hello World!"
             />
     </com.rainbell.www.slidelayout.ScrollerLayout>
