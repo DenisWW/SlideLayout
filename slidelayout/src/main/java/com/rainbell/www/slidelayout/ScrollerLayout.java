@@ -85,7 +85,6 @@ public class ScrollerLayout extends ViewGroup {
         int time = 0;
         for (int j = 0; j < getChildCount(); j++) {
             View view = getChildAt(j);
-            Log.e("view", "=" + view.toString() + "    =" + view.getMeasuredWidth());
             view.layout(0, time, view.getMeasuredWidth(), time += view.getMeasuredHeight());
         }
 //        }
@@ -141,10 +140,6 @@ public class ScrollerLayout extends ViewGroup {
                 mYMove = event.getRawY();
                 float scrollY = (mYLastMove - mYMove) * 0.5f;
                 float overscrollTop = (mYMove - mYDown) * 0.5F;
-//                Log.e("    event.getY();", "=" + mYMove + "  event.getRawY()=" + mYDown + "    =" + event.getY());
-                if (scrollY < 0) {
-//                    scrollBy(0, (int) scrollY);
-                }
                 if (overscrollTop <= 0.0F) {
                     return false;
                 }
