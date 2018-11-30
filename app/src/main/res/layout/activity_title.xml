@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,10 +8,44 @@
     android:layout_height="match_parent"
     tools:context=".activity.TitleActivity">
 
+    <HorizontalScrollView
+        android:id="@+id/horizontal"
+        android:layout_width="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <com.rainbell.www.slidelayout.customize.CusRelativeLayout
+            android:id="@+id/cus_relative"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:backgroundGradientColorDirection="vertical"
+            app:backgroundGradientColorEnd="@color/start"
+            app:backgroundGradientColorStart="@color/end"
+            app:childTitleMargin="4dp"
+            app:childTitlePaddingBottom="4dp"
+            app:childTitlePaddingLeft="4dp"
+            app:childTitlePaddingRight="4dp"
+            app:childTitlePaddingTop="4dp"
+            app:radiusBackgroundHalf="true"
+            app:textString="娘子,啊哈,你在干什么"
+            app:textUnSelectorColorEnd="@color/start"
+            app:textUnSelectorColorStart="@color/end"
+            app:titleTextSize="18dp">
+
+        </com.rainbell.www.slidelayout.customize.CusRelativeLayout>
+    </HorizontalScrollView>
+
+
     <android.support.v4.view.ViewPager
-        android:id="@+id/viewPager"
+        android:id="@+id/view_Pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/horizontal">
 
     </android.support.v4.view.ViewPager>
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

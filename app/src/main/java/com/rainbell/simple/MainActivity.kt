@@ -1,15 +1,11 @@
 package com.rainbell.simple
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.View
+import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.rainbell.simple.activity.TitleActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import android.view.MotionEvent
-import android.R.attr.action
 
 
 class MainActivity : AppCompatActivity() {

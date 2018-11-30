@@ -10,7 +10,7 @@ public class CusRelativeManager {
     private CusRelativeLayout cusRelativeLayout;
     private ClickTitleViewListener listener;
 
-    private CusRelativeManager(Builder builder) {
+    public CusRelativeManager(Builder builder) {
         this.viewPager = builder.viewPager;
         this.cusRelativeLayout = builder.cusRelativeLayout;
         this.listener = builder.listener;
