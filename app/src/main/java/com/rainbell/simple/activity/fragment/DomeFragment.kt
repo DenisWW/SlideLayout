@@ -1,4 +1,4 @@
-package com.rainbell.simple.activity.adapter
+package com.rainbell.simple.activity.fragment
 
 import android.os.Bundle
 import android.support.v4.app.Fragment

@@ -17,12 +17,17 @@ public class CusRelativeManager {
         addScrollListener();
     }
 
+    public void attachCusRelativeLayout(CusRelativeLayout cusRelativeLayout) {
+        this.cusRelativeLayout = cusRelativeLayout;
+    }
+
     private void addScrollListener() {
         if (viewPager != null) {
             viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int i, float v, int i1) {
-                    if (cusRelativeLayout != null) cusRelativeLayout.setViewOffset(i, v,i1,cusRelativeLayout.getId());
+                    if (cusRelativeLayout != null)
+                        cusRelativeLayout.setViewOffset(i, v, i1, cusRelativeLayout.getId());
 
                 }
 

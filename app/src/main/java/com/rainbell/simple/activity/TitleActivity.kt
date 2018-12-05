@@ -3,10 +3,9 @@ package com.rainbell.simple.activity
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.view.PagerAdapter
 import android.support.v4.view.ViewPager
 import com.rainbell.simple.R
-import com.rainbell.simple.activity.adapter.DomeFragment
+import com.rainbell.simple.activity.fragment.DomeFragment
 import com.rainbell.simple.activity.adapter.ViewPagerAdapterKotlin
 import com.rainbell.www.slidelayout.customize.CusRelativeManager
 import kotlinx.android.synthetic.main.activity_title.*

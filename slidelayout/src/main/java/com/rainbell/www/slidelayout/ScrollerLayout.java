@@ -30,9 +30,9 @@ public class ScrollerLayout extends ViewGroup {
      */
     private Scroller mScroller;
     //最大拖拽距离越大响应越慢 越迟钝 越小 响应越快 越灵敏
-    int mTotalDragDistance;
+    private int mTotalDragDistance;
     //最大位移
-    int mSpinnerOffsetEnd;
+    private int mSpinnerOffsetEnd;
     /**
      * 判定为拖动的最小移动像素数
      */
@@ -40,7 +40,7 @@ public class ScrollerLayout extends ViewGroup {
     private float mYDown = 0;
     private float mYMove = 0;
     private int height;
-
+    private int minimumFlingVelocity, maximumFlingVelocity;
     /**
      * 上次触发ACTION_MOVE事件时的屏幕坐标
      */
@@ -56,6 +56,8 @@ public class ScrollerLayout extends ViewGroup {
         mScroller = new Scroller(context);
         ViewConfiguration viewConfiguration = ViewConfiguration.get(context);
         mTouchSlop = viewConfiguration.getScaledTouchSlop();
+        minimumFlingVelocity = viewConfiguration.getScaledMinimumFlingVelocity();
+        maximumFlingVelocity = viewConfiguration.getScaledMaximumFlingVelocity();
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         mTotalDragDistance = (int) (100 * metrics.density);
 //        mSpinnerOffsetEnd = mTotalDragDistance;
