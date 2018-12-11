@@ -11,7 +11,6 @@ class DomeFragment : Fragment() {
     var rootView: View? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         rootView=inflater.inflate(R.layout.fragment_layout,null)
-
         return rootView
     }
 

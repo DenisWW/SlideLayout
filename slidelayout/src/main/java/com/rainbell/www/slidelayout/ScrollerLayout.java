@@ -30,9 +30,9 @@ public class ScrollerLayout extends ViewGroup {
      */
     private Scroller mScroller;
     //最大拖拽距离越大响应越慢 越迟钝 越小 响应越快 越灵敏
-    private int mTotalDragDistance;
+    int mTotalDragDistance;
     //最大位移
-    private int mSpinnerOffsetEnd;
+    int mSpinnerOffsetEnd;
     /**
      * 判定为拖动的最小移动像素数
      */
@@ -40,12 +40,14 @@ public class ScrollerLayout extends ViewGroup {
     private float mYDown = 0;
     private float mYMove = 0;
     private int height;
-    private int minimumFlingVelocity, maximumFlingVelocity;
+    private int min, max;
     /**
      * 上次触发ACTION_MOVE事件时的屏幕坐标
      */
     private float mYLastMove;
     int count;
+    private boolean isRefreshing = false;
+    int mCurrentTargetOffsetTop;
 
     public ScrollerLayout(Context context) {
         this(context, null);
@@ -56,8 +58,8 @@ public class ScrollerLayout extends ViewGroup {
         mScroller = new Scroller(context);
         ViewConfiguration viewConfiguration = ViewConfiguration.get(context);
         mTouchSlop = viewConfiguration.getScaledTouchSlop();
-        minimumFlingVelocity = viewConfiguration.getScaledMinimumFlingVelocity();
-        maximumFlingVelocity = viewConfiguration.getScaledMaximumFlingVelocity();
+        min = viewConfiguration.getScaledMinimumFlingVelocity();
+        max = viewConfiguration.getScaledMaximumFlingVelocity();
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         mTotalDragDistance = (int) (100 * metrics.density);
 //        mSpinnerOffsetEnd = mTotalDragDistance;
@@ -87,6 +89,7 @@ public class ScrollerLayout extends ViewGroup {
         int time = 0;
         for (int j = 0; j < getChildCount(); j++) {
             View view = getChildAt(j);
+//            Log.e("view", "=" + view.toString() + "    =" + view.getMeasuredWidth());
             view.layout(0, time, view.getMeasuredWidth(), time += view.getMeasuredHeight());
         }
 //        }
@@ -142,25 +145,45 @@ public class ScrollerLayout extends ViewGroup {
                 mYMove = event.getRawY();
                 float scrollY = (mYLastMove - mYMove) * 0.5f;
                 float overscrollTop = (mYMove - mYDown) * 0.5F;
-                if (overscrollTop <= 0.0F) {
+                if (scrollY < 0) {
+//                    scrollBy(0, (int) scrollY);
+                }
+                if (isRefreshing) {
+                    isRefreshing = false;
+                    mCurrentTargetOffsetTop = mTotalDragDistance;
+                }
+                if ((mCurrentTargetOffsetTop > 0 ? overscrollTop += mCurrentTargetOffsetTop : overscrollTop) <= 0.0F) {
                     return false;
                 }
+//                if (mCurrentTargetOffsetTop > 0) overscrollTop += mCurrentTargetOffsetTop;
                 moveSpinner(overscrollTop);
 //                scrollTo(0, (int) (mYDown - mYMove));
                 mYLastMove = mYMove;
                 // ViewCompat.offsetTopAndBottom(this, -(int) scrollY);
                 break;
             case MotionEvent.ACTION_UP:
-                // 调用startScroll()方法来初始化滚动数据并刷新界面
-                mScroller.startScroll(0, getScrollY(), 0, -getScrollY());
 //                mScroller.startScroll(0, getScrollY(), 0, mSpinnerOffsetEnd);
                 float y = event.getY();
                 overscrollTop = (y - mYDown) * 0.5F;
                 finishSpinner(overscrollTop);
+                if (overscrollTop > mTotalDragDistance) {
+                    setRefreshing(true);
+                } else {
+                    mScroller.startScroll(0, getScrollY(), 0, -getScrollY());
+                    isRefreshing = false;
+                    mCurrentTargetOffsetTop = 0;
+                }
                 invalidate();
+//                awakenScrollBars(mScroller.getDuration());
                 break;
         }
         return super.onTouchEvent(event);
+    }
+
+    public void setRefreshing(boolean isRefreshing) {
+        this.isRefreshing = isRefreshing;
+        mScroller.startScroll(0, getScrollY(), 0, -(getScrollY() + mSpinnerOffsetEnd));
+
     }
 
     private void finishSpinner(float overscrollTop) {
@@ -168,11 +191,6 @@ public class ScrollerLayout extends ViewGroup {
     }
 
 
-    /**
-     * 仿照google下拉刷新 控件 计算弹力值
-     *
-     * @param overscrollTop
-     */
     private void moveSpinner(float overscrollTop) {
 
         //原始百分比
@@ -213,6 +231,5 @@ public class ScrollerLayout extends ViewGroup {
 //        this.bringToFront();
         scrollTo(0, -offset);
     }
-
 
 }
