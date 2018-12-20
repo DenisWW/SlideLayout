@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.view.ViewPager
 import com.rainbell.simple.R
-import com.rainbell.simple.activity.fragment.DomeFragment
-import com.rainbell.simple.activity.adapter.ViewPagerAdapterKotlin
+import com.rainbell.simple.fragment.DomeFragment
+import com.rainbell.simple.adapter.ViewPagerAdapterKotlin
 import com.rainbell.www.slidelayout.customize.CusRelativeManager
 import kotlinx.android.synthetic.main.activity_title.*
 

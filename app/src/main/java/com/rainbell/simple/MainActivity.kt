@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     internal var windowManager: WindowManager? = null
     var textView: TextView? = null
     var mParams: WindowManager.LayoutParams? = null
+    var list: ArrayList<Int>? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -49,6 +50,26 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, sample_text1!!.text, Toast.LENGTH_SHORT).show();
 
         }
+        this@MainActivity.list = ArrayList()
+        for (i in 0..20) {
+            this@MainActivity.list!!.add(i)
+        }
+
+
+        list!!.forEach {
+            if (it == 10) return@forEach
+        }
+//        for (it in list!!) {
+//        }
+//        for (i in list!!.indices) {
+//        }
+//        for (i: Int in list!!) {
+//        }
+//        for ((idex, w) in list!!.withIndex()) {
+//        }
+//        list!!.forEach why@{
+//            if (it == 10) return@why
+//        }
         sample_text.setOnClickListener {
             val intent = Intent();
             intent.setClass(this, TitleActivity().javaClass)
@@ -56,9 +77,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
 
         }
+//        lazy {  by Lazy}
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean  {
 //        if (keyCode == KeyEvent.KEYCODE_BACK && event!!.action == KeyEvent.ACTION_UP) {
 //            Log.e("KEYCODE_BACK", "======")
 //            return true
