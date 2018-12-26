@@ -1,12 +1,12 @@
 package com.rainbell.simple.tools;
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.view.View;
 
 import com.rainbell.simple.config.Config;
+
+import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class Utils {
     public static void verticalCome(final View view) {
