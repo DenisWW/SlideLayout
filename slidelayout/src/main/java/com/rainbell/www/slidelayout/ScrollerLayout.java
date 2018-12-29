@@ -64,6 +64,7 @@ public class ScrollerLayout extends ViewGroup {
         mTotalDragDistance = (int) (100 * metrics.density);
 //        mSpinnerOffsetEnd = mTotalDragDistance;
         mSpinnerOffsetEnd = (int) (64 * metrics.density);
+        Log.e("max==", max + "  min=" + min);
     }
 
     @Override
@@ -164,8 +165,9 @@ public class ScrollerLayout extends ViewGroup {
             case MotionEvent.ACTION_UP:
 //                mScroller.startScroll(0, getScrollY(), 0, mSpinnerOffsetEnd);
                 float y = event.getY();
-                overscrollTop = (y - mYDown) * 0.5F;
-                finishSpinner(overscrollTop);
+                overscrollTop = (y - mYDown-getScrollY()) * 0.5F;
+//                finishSpinner(overscrollTop);
+                Log.e(", getScrollY()", "=" + getScrollY()+"  overscrollTop="+overscrollTop);
                 if (overscrollTop > mTotalDragDistance) {
                     setRefreshing(true);
                 } else {
@@ -223,6 +225,7 @@ public class ScrollerLayout extends ViewGroup {
         // 当移动距离小于 mTotalDragDistance 不做弹力抵消   只算 移动距离占总距离的百分比（最大为1） 乘以  dragPercent  extraMove值为0
         // 当移动距离大于mTotalDragDistance    移动距离 + 拖拽的最大距离extraMove（最大为slingshotDist）  extraMove值为0
         int targetY = (int) (slingshotDist * dragPercent + extraMove);
+        Log.e("dragPercent=", dragPercent + "");
         setTargetOffsetTopAndBottom(targetY);
     }
 
