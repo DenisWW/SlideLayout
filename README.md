@@ -14,3 +14,4 @@ new CusRelativeManager.Builder(CusRelativeLayout,viewPager).addClicTitleViewList
 
 
 混淆注意： -keep class com.ranbell,www.slidelayout.customize.** {*;}
+![image](https://github.com/RookieForMingge/LabelForWidAndHei/blob/master/1.png?raw=true)
