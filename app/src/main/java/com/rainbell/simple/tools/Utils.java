@@ -2,7 +2,10 @@ package com.rainbell.simple.tools;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.Context;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.rainbell.simple.config.Config;
 
@@ -26,5 +29,14 @@ public class Utils {
 //        AnimatorSet set = new AnimatorSet();
 //        set.play(animator);
     }
-
+    public static int getScreenWidth(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(outMetrics);
+        return outMetrics.widthPixels;
+    }
+    public static int dip2px(Context context, float dipValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dipValue * scale + 0.5f);
+    }
 }

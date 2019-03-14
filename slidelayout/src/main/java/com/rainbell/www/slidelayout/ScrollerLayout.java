@@ -165,9 +165,8 @@ public class ScrollerLayout extends ViewGroup {
             case MotionEvent.ACTION_UP:
 //                mScroller.startScroll(0, getScrollY(), 0, mSpinnerOffsetEnd);
                 float y = event.getY();
-                overscrollTop = (y - mYDown-getScrollY()) * 0.5F;
+                overscrollTop = (y - mYDown + (mCurrentTargetOffsetTop > 0 ? mTotalDragDistance : 0)) * 0.5F;
 //                finishSpinner(overscrollTop);
-                Log.e(", getScrollY()", "=" + getScrollY()+"  overscrollTop="+overscrollTop);
                 if (overscrollTop > mTotalDragDistance) {
                     setRefreshing(true);
                 } else {

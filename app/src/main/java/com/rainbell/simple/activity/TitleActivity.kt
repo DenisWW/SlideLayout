@@ -19,6 +19,6 @@ class TitleActivity : AppCompatActivity() {
         view_Pager = findViewById(R.id.view_Pager)
         fragments = arrayOf(DomeFragment(), DomeFragment(), DomeFragment())
         view_Pager!!.adapter = ViewPagerAdapterKotlin(supportFragmentManager, fragments!!)
-        val cusRelativeManager = CusRelativeManager(CusRelativeManager.Builder(cus_relative, view_Pager))
+      CusRelativeManager(CusRelativeManager.Builder(cus_relative, view_Pager))
     }
 }
