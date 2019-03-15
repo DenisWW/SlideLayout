@@ -1,6 +1,9 @@
 # SlideLayout
 Android滑动layout
-高仿今日头条导航栏
+滑块导航栏
+
+
+设置依赖 implementation 'com.github.DenisWW:SlideLayout:1.0.3'
 
 简单使用与设置（内容使用 ','分割）：
 
